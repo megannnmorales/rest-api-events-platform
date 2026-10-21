@@ -1,4 +1,4 @@
-from db.seed import seed_user_data
+from db.seed import seed_data
 
 if __name__ == "__main__":
-    seed_user_data()
+    seed_data()

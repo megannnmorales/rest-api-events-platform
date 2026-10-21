@@ -1,4 +1,4 @@
-from db.load_transform import load_data
+from db.load import load_data
 import json
 
 import pytest

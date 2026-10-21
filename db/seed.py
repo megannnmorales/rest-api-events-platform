@@ -8,7 +8,9 @@ def drop_data():
     
     connection = get_connection()
     cursor = connection.cursor()
-    sql_statement = '''DROP TABLE IF EXISTS users;'''
+    sql_statement = '''DROP TABLE IF EXISTS venues;
+    DROP TABLE IF EXISTS users;
+    '''
 
     cursor = connection.cursor()
 
@@ -26,10 +28,14 @@ def create_data():
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);'''
-     
-    cursor = connection.cursor()
+    created_at TIMESTAMPTZ DEFAULT NOW());
+
+    CREATE TABLE venues (
+    venue_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address text,
+    capacity INT);
+    ''' 
      
     cursor.execute(sql_statement)
     connection.commit()
@@ -37,15 +43,11 @@ def create_data():
     connection.close()
   
 
-def insert_data(data):
+def insert_user_data(user_data):
     connection = get_connection()
     cursor = connection.cursor()
-#   {
-#     "name": "Alice Rahman",
-#     "email": "alice@example.com",
-#     "password": "password123"
-#   },
-    for user in data:
+
+    for user in user_data:
         
         insert_statement = "INSERT INTO users (email, name, password) VALUES (%s, %s, %s);"
 
@@ -56,13 +58,27 @@ def insert_data(data):
     cursor.close()
     connection.close()
 
+def insert_venue_data(venue_data):
+    connection = get_connection()
+    cursor = connection.cursor()
 
-def seed_user_data():
+    for venue in venue_data:
+            
+            insert_statement = "INSERT INTO venues(name, address, capacity) VALUES (%s, %s, %s);"
+    
+            cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"]))
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+def seed_data():
     drop_data()
     create_data()
-    data = load_data("db/data/users.json")
-    insert_data(data)
+    user_data = load_data("db/data/users.json")
+    venue_data = load_data("db/data/venues.json")
+    insert_user_data(user_data)
+    insert_venue_data(venue_data)
         
-
-
 
