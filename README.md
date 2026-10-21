@@ -27,8 +27,6 @@ psql (17.11)
 psql -d postgres -f db/setup.sql
 ```
 
-# Database Seeding
-
 # Database Connection
 
 1. Create a file called `.env.development` in the root of the project, containing:
@@ -44,3 +42,11 @@ psql -d postgres -f db/setup.sql
 ```
 
 > `.env.*` files are listed in `.gitignore`, so you must create this file yourself after cloning.
+
+# Database Seeding
+
+1. ENV=development python main.py
+
+# Running Tests
+
+Run the pytest command.
