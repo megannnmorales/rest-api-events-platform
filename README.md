@@ -26,3 +26,21 @@ psql (17.11)
 ```bash
 psql -d postgres -f db/setup.sql
 ```
+
+# Database Seeding
+
+# Database Connection
+
+1. Create a file called `.env.development` in the root of the project, containing:
+
+```
+   PGDATABASE=nc_plus_one
+```
+
+2. Choose the environment when you run a command:
+
+```bash
+   ENV=development python db/seed.py
+```
+
+> `.env.*` files are listed in `.gitignore`, so you must create this file yourself after cloning.
