@@ -6,3 +6,23 @@ This API allows users to register, browse events, RSVP, and manage their attenda
 # Technologies
 Python 3.13.15
 psql (17.11)
+
+## Setup
+
+1. Fork and clone this repository
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+# Database Setup
+
+1. Run setup.sql file:
+```bash
+psql -d postgres -f db/setup.sql
+```
