@@ -6,3 +6,6 @@ def load_data(filepath):
 
         data = json.load(file)
     return data
+
+        
+
