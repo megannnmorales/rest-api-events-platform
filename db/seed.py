@@ -6,7 +6,8 @@ from db.load import load_data
 
 def drop_data(cursor):
     
-    drop_sql_statement = '''DROP TABLE IF EXISTS events;
+    drop_sql_statement = '''DROP TABLE IF EXISTS rsvps; 
+    DROP TABLE IF EXISTS events;
     DROP TABLE IF EXISTS venues;
     DROP TABLE IF EXISTS users;
     '''
@@ -16,29 +17,34 @@ def drop_data(cursor):
 def create_data(cursor):
     
     sql_statement = '''CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW());
 
     CREATE TABLE venues (
-    venue_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address text,
     capacity INT);
 
     CREATE TABLE events (
-    event_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     starts_at TIMESTAMPTZ NOT NULL,
     ends_at TIMESTAMPTZ NOT NULL,
-    organiser_id INT REFERENCES users(user_id) NOT NULL,
-    venue_id INT REFERENCES venues(venue_id) NOT NULL,
+    organiser_id INT REFERENCES users(id) NOT NULL,
+    venue_id INT REFERENCES venues(id) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW());
-    ''' 
-     
+    
+    CREATE TABLE rsvps (
+    id SERIAL PRIMARY KEY,
+    attendee_id INT REFERENCES users(id) NOT NULL,
+    event_id INT REFERENCES events(id) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW());
+    '''  
     cursor.execute(sql_statement)
 
   
@@ -51,8 +57,8 @@ def insert_user_data(user_data, cursor):
 
         cursor.execute(insert_statement,(user["email"], user["name"], user["password"]))
 
+
 def insert_venue_data(venue_data, cursor):
-    
 
     for venue in venue_data:
             
@@ -61,7 +67,6 @@ def insert_venue_data(venue_data, cursor):
         cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"]))
 
 def insert_event_data(events_data, cursor):
-    
 
     for event in events_data:
             
@@ -69,7 +74,13 @@ def insert_event_data(events_data, cursor):
     
         cursor.execute(insert_statement,(event["title"], event["description"], event["starts_at"], event["ends_at"], event["organiser_id"], event["venue_id"]))
 
+def insert_rsvp_data(rsvp_data, cursor):
+
+    for rsvp in rsvp_data:
+            
+        insert_statement = "INSERT INTO rsvps(attendee_id, event_id) VALUES (%s, %s);"
     
+        cursor.execute(insert_statement,(rsvp["attendee_id"], rsvp["event_id"]))   
 
 def seed_data():
     connection = get_connection()
@@ -79,9 +90,11 @@ def seed_data():
     user_data = load_data("db/data/users.json")
     venue_data = load_data("db/data/venues.json")
     event_data = load_data("db/data/events.json")
+    rsvp_data = load_data("db/data/rsvps.json")
     insert_user_data(user_data, cursor)
     insert_venue_data(venue_data, cursor)
     insert_event_data(event_data, cursor)
+    insert_rsvp_data(rsvp_data, cursor)
     connection.commit()
     cursor.close()
     connection.close()    
