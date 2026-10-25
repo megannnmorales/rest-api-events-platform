@@ -6,11 +6,12 @@ from db.load import load_data
 
 def drop_data(cursor):
     
-    sql_statement = '''DROP TABLE IF EXISTS venues;
+    drop_sql_statement = '''DROP TABLE IF EXISTS events;
+    DROP TABLE IF EXISTS venues;
     DROP TABLE IF EXISTS users;
     '''
 
-    cursor.execute(sql_statement)
+    cursor.execute(drop_sql_statement)
 
 def create_data(cursor):
     
@@ -26,6 +27,16 @@ def create_data(cursor):
     name VARCHAR(255) NOT NULL,
     address text,
     capacity INT);
+
+    CREATE TABLE events (
+    event_id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    starts_at TIMESTAMPTZ NOT NULL,
+    ends_at TIMESTAMPTZ NOT NULL,
+    organiser_id INT REFERENCES users(user_id) NOT NULL,
+    venue_id INT REFERENCES venues(venue_id) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW());
     ''' 
      
     cursor.execute(sql_statement)
@@ -49,6 +60,15 @@ def insert_venue_data(venue_data, cursor):
     
         cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"]))
 
+def insert_event_data(events_data, cursor):
+    
+
+    for event in events_data:
+            
+        insert_statement = "INSERT INTO events(title, description, starts_at, ends_at, organiser_id, venue_id) VALUES (%s, %s, %s, %s, %s, %s);"
+    
+        cursor.execute(insert_statement,(event["title"], event["description"], event["starts_at"], event["ends_at"], event["organiser_id"], event["venue_id"]))
+
     
 
 def seed_data():
@@ -58,8 +78,10 @@ def seed_data():
     create_data(cursor)
     user_data = load_data("db/data/users.json")
     venue_data = load_data("db/data/venues.json")
+    event_data = load_data("db/data/events.json")
     insert_user_data(user_data, cursor)
     insert_venue_data(venue_data, cursor)
+    insert_event_data(event_data, cursor)
     connection.commit()
     cursor.close()
     connection.close()    
