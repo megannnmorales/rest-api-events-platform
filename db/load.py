@@ -9,3 +9,24 @@ def load_data(filepath):
 
         
 
+def get_city(address):
+
+    if address == None:
+        return None
+    
+    split_address = address.split(",")
+
+    city = str(split_address[1].strip())
+
+    return city
+
+def get_postcode(address):
+
+    if address == None:
+        return None
+    
+    split_address = address.split(",")
+
+    postcode = str(split_address[2].strip())
+
+    return postcode

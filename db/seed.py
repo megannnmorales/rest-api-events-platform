@@ -85,17 +85,20 @@ def insert_rsvp_data(rsvp_data, cursor):
 def seed_data():
     connection = get_connection()
     cursor = connection.cursor()
-    drop_data(cursor)
-    create_data(cursor)
-    user_data = load_data("db/data/users.json")
-    venue_data = load_data("db/data/venues.json")
-    event_data = load_data("db/data/events.json")
-    rsvp_data = load_data("db/data/rsvps.json")
-    insert_user_data(user_data, cursor)
-    insert_venue_data(venue_data, cursor)
-    insert_event_data(event_data, cursor)
-    insert_rsvp_data(rsvp_data, cursor)
-    connection.commit()
-    cursor.close()
-    connection.close()    
+
+    try: 
+        drop_data(cursor)
+        create_data(cursor)
+        user_data = load_data("db/data/users.json")
+        venue_data = load_data("db/data/venues.json")
+        event_data = load_data("db/data/events.json")
+        rsvp_data = load_data("db/data/rsvps.json")
+        insert_user_data(user_data, cursor)
+        insert_venue_data(venue_data, cursor)
+        insert_event_data(event_data, cursor)
+        insert_rsvp_data(rsvp_data, cursor)
+        connection.commit()
+    finally:
+        cursor.close()
+        connection.close()    
 
