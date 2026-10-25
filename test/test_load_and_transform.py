@@ -1,6 +1,6 @@
-from db.load import load_data
-from db.load import get_city
-from db.load import get_postcode
+from db.load_and_transform import load_data
+from db.load_and_transform import get_city
+from db.load_and_transform import get_postcode
 import json
 
 import pytest
@@ -43,23 +43,49 @@ def test_data_load_data_returns_correct_data(tmp_path):
 
 
 def test_no_address_returns_no_city():
-    assert get_city(None) == None
+    venue = {
+      "name": "Online – Zoom",
+      "address": None,
+      "capacity": 500
+    }
+    
+    expected = None
+    result = get_city(venue)
+    
+    assert expected == result
 
 def test_address_returns_city():
+  venue = {
+    "name": "Nexus, University of Leeds",
+    "address": "Discovery Way, Leeds, LS2 3AA",
+    "capacity": 200
+  }
 
-    address = "Discovery Way, Leeds, LS2 3AA"
-    expected = "Leeds"
-    result = get_city(address)
+  expected = "Leeds"
+  result = get_city(venue)
 
-    assert result == expected
+  assert result == expected
 
 def test_no_address_returns_no_postcode():
-    assert get_postcode(None) == None
+    venue = {
+          "name": "Online – Zoom",
+          "address": None,
+          "capacity": 500
+        }
+        
+    expected = None
+    result = get_postcode(venue)
+        
+    assert expected == result
 
 def test_address_returns_postcode():
+    venue = {
+        "name": "Nexus, University of Leeds",
+        "address": "Discovery Way, Leeds, LS2 3AA",
+        "capacity": 200
+      }
 
-    address = "Discovery Way, Leeds, LS2 3AA"
     expected = "LS2 3AA"
-    result = get_postcode(address)
+    result = get_postcode(venue)
 
     assert result == expected

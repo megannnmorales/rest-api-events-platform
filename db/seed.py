@@ -1,7 +1,9 @@
 import psycopg2
 import json
 from db.connection import get_connection 
-from db.load import load_data
+from db.load_and_transform import load_data
+from db.load_and_transform import get_postcode
+from db.load_and_transform import get_city
 
 
 def drop_data(cursor):
@@ -17,33 +19,39 @@ def drop_data(cursor):
 def create_data(cursor):
     
     sql_statement = '''CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    name VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW());
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        name VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
 
     CREATE TABLE venues (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    address text,
-    capacity INT);
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        address text,
+        capacity INT,
+        city VARCHAR(255),
+        postcode VARCHAR(255)
+    );
 
     CREATE TABLE events (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
-    starts_at TIMESTAMPTZ NOT NULL,
-    ends_at TIMESTAMPTZ NOT NULL,
-    organiser_id INT REFERENCES users(id) NOT NULL,
-    venue_id INT REFERENCES venues(id) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW());
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description VARCHAR(255),
+        starts_at TIMESTAMPTZ NOT NULL,
+        ends_at TIMESTAMPTZ NOT NULL,
+        organiser_id INT REFERENCES users(id) NOT NULL,
+        venue_id INT REFERENCES venues(id) NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
     
     CREATE TABLE rsvps (
-    id SERIAL PRIMARY KEY,
-    attendee_id INT REFERENCES users(id) NOT NULL,
-    event_id INT REFERENCES events(id) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW());
+        id SERIAL PRIMARY KEY,
+        attendee_id INT REFERENCES users(id) NOT NULL,
+        event_id INT REFERENCES events(id) NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
     '''  
     cursor.execute(sql_statement)
 
@@ -61,10 +69,11 @@ def insert_user_data(user_data, cursor):
 def insert_venue_data(venue_data, cursor):
 
     for venue in venue_data:
-            
-        insert_statement = "INSERT INTO venues(name, address, capacity) VALUES (%s, %s, %s);"
+        city = get_city(venue)
+        postcode = get_postcode(venue)
+        insert_statement = "INSERT INTO venues(name, address, capacity, city, postcode) VALUES (%s, %s, %s, %s, %s);"
     
-        cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"]))
+        cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"], city, postcode))
 
 def insert_event_data(events_data, cursor):
 

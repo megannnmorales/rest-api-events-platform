@@ -9,7 +9,9 @@ def load_data(filepath):
 
         
 
-def get_city(address):
+def get_city(venue):
+
+    address = venue["address"]
 
     if address == None:
         return None
@@ -20,8 +22,10 @@ def get_city(address):
 
     return city
 
-def get_postcode(address):
+def get_postcode(venue):
 
+    address = venue["address"]
+    
     if address == None:
         return None
     
