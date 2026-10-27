@@ -1,11 +1,11 @@
 # Rest API Events Platform
 
-This API allows users to register, browse events, RSVP, and manage their attendance. Organisers are able to create and manage events, and view statistics about their audience.
+This API allows users to register, browse events, RSVP, and manage their attendance. Organisers can create and manage events, and view statistics about their audience.
 
+## Technologies
 
-# Technologies
-Python 3.13.15
-psql (17.11)
+- Python 3.13.15
+- psql (17.11)
 
 ## Setup
 
@@ -20,33 +20,38 @@ psql (17.11)
    pip install -r requirements.txt
    ```
 
-# Database Setup
+## Database Setup
 
-1. Run setup.sql file:
-```bash
-psql -d postgres -f db/setup.sql
-```
-
-# Database Connection
-
-1. Create a file called `.env.development` in the root of the project, containing:
-
-```
-   PGDATABASE=nc_plus_one
-```
-
-2. Choose the environment when you run a command:
+Create the development and test databases:
 
 ```bash
-   ENV=development python db/seed.py
+psql -d postgres -f db/setup_db.sql
 ```
 
-> `.env.*` files are listed in `.gitignore`, so you must create this file yourself after cloning.
+## Environment Variables
 
-# Database Seeding
+Create two files in the root of the project. They are listed in `.gitignore`, so you must create them yourself after cloning.
 
-1. ENV=development python main.py
+**`.env.development`**
+```
+PGDATABASE=nc_plus_one
+```
 
-# Running Tests
+**`.env.test`**
+```
+PGDATABASE=test_nc_plus_one
+```
 
-Run the pytest command.
+## Seeding the Development Database
+
+```bash
+ENV=development python -m db.seed
+```
+
+## Running the Tests
+
+Tests use the test database, which is reset with fresh data from `db/data/test/` before every test. The tests set `ENV=test` automatically.
+
+```bash
+pytest
+```
