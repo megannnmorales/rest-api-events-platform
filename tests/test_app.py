@@ -4,13 +4,12 @@ os.environ["ENV"] = "test"
 
 import pytest
 from fastapi.testclient import TestClient
-from db.seed import seed_data
-from db.connection import get_connection
-from db.load import load_data
+from db.seed_test import seed_test_data
+from app.main import app
 
 @pytest.fixture(autouse=True)
 def seed_test_db():
-    seed_data()
+    seed_test_data()
 
 
 @pytest.fixture()
