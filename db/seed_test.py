@@ -2,7 +2,7 @@ from db.seed import drop_data, create_data, insert_user_data, insert_venue_data,
 from db.connection import get_connection
 from db.load import load_data
 
-def seed_test_db():
+def seed_test_data():
     connection = get_connection()
     cursor = connection.cursor()
 
