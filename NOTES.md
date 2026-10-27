@@ -6,3 +6,5 @@
 - venue normalisation parked. Focusing on endpoints. Revisit later if needed.
 
 - Refactor seeding data later so can by used by dev and test
+
+- Add more integration tests
