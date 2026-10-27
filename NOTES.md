@@ -4,3 +4,5 @@
 - Split create/drop into per-table functions: you were considering looping over a list of table names for the drops
 
 - venue normalisation parked. Focusing on endpoints. Revisit later if needed.
+
+- Refactor seeding data later so can by used by dev and test
