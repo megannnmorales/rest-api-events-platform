@@ -1,9 +1,7 @@
 import psycopg2
 import json
 from db.connection import get_connection 
-from db.load_and_transform import load_data
-from db.load_and_transform import get_postcode
-from db.load_and_transform import get_city
+from db.load import load_data
 
 
 def drop_data(cursor):
@@ -69,11 +67,9 @@ def insert_user_data(user_data, cursor):
 def insert_venue_data(venue_data, cursor):
 
     for venue in venue_data:
-        city = get_city(venue)
-        postcode = get_postcode(venue)
         insert_statement = "INSERT INTO venues(name, address, capacity, city, postcode) VALUES (%s, %s, %s, %s, %s);"
     
-        cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"], city, postcode))
+        cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"]))
 
 def insert_event_data(events_data, cursor):
 
