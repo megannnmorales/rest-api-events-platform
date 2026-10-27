@@ -28,9 +28,7 @@ def create_data(cursor):
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         address text,
-        capacity INT,
-        city VARCHAR(255),
-        postcode VARCHAR(255)
+        capacity INT
     );
 
     CREATE TABLE events (
@@ -67,7 +65,7 @@ def insert_user_data(user_data, cursor):
 def insert_venue_data(venue_data, cursor):
 
     for venue in venue_data:
-        insert_statement = "INSERT INTO venues(name, address, capacity, city, postcode) VALUES (%s, %s, %s, %s, %s);"
+        insert_statement = "INSERT INTO venues(name, address, capacity) VALUES (%s, %s, %s);"
     
         cursor.execute(insert_statement,(venue["name"], venue["address"], venue["capacity"]))
 
@@ -94,10 +92,10 @@ def seed_data():
     try: 
         drop_data(cursor)
         create_data(cursor)
-        user_data = load_data("db/data/users.json")
-        venue_data = load_data("db/data/venues.json")
-        event_data = load_data("db/data/events.json")
-        rsvp_data = load_data("db/data/rsvps.json")
+        user_data = load_data("db/data/development/users.json")
+        venue_data = load_data("db/data/development/venues.json")
+        event_data = load_data("db/data/development/events.json")
+        rsvp_data = load_data("db/data/development/rsvps.json")
         insert_user_data(user_data, cursor)
         insert_venue_data(venue_data, cursor)
         insert_event_data(event_data, cursor)
