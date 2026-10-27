@@ -52,7 +52,7 @@ def test_no_address_returns_no_city():
     expected = None
     result = get_city(venue)
     
-    assert expected == result
+    assert result == expected
 
 def test_address_returns_city():
   venue = {
@@ -76,7 +76,7 @@ def test_no_address_returns_no_postcode():
     expected = None
     result = get_postcode(venue)
         
-    assert expected == result
+    assert result == expected
 
 def test_address_returns_postcode():
     venue = {
