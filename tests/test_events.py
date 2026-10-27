@@ -1,15 +1,18 @@
-def test_get_events_responds_with200(client):
+from starlette.testclient import TestClient
+
+
+def test_get_events_responds_with200(client: TestClient):
     response = client.get("/events")
 
     assert response.status_code == 200
 
-def test_get_events_responds_with_list_on_key_of_events(client):
+def test_get_events_responds_with_list_on_key_of_events(client: TestClient):
     events = client.get("/events").json()["events"]
 
     assert isinstance(events, list)
 
 
-def test_check_returns_all_events(client):
+def test_check_returns_all_events(client: TestClient):
     result = client.get("/events").json()["events"]
     expected = [
     {
@@ -60,7 +63,24 @@ def test_check_returns_all_events(client):
 ]
     assert result == expected
 
-def test_get_events_returns_events(client):
+def test_get_events_returns_events(client: TestClient):
     events = client.get("/events").json()["events"]
 
     assert len(events) == 5
+
+
+def test_get_events_returns_specific_event(client):
+    response = client.get(f"/events/1")
+    assert response.status_code == 200
+    assert response.json()["event"]["id"] == 1
+
+# def test_get_events_returns_specific_event(client):
+#     response = client.get(f"/bookings/1")
+#     assert response.status_code == 200
+#     assert response.json()["booking_id"] == 1
+
+
+# def test_get_booking_not_found_returns_404(client):
+#     response = client.get("/bookings/999999")
+#     assert response.status_code == 404
+#     assert response.json()["error"]["code"] == "NOT_FOUND"
