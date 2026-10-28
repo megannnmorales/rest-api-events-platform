@@ -24,6 +24,8 @@ def get_one_event(event_id):
     WHERE events.id = %s""", (event_id,))
     columns = [desc[0] for desc in cursor.description]
     row = cursor.fetchone()
+    if row is None:
+        return None
     cursor.close()
     conn.close()
     event = dict(zip(columns, row))

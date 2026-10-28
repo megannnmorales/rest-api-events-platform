@@ -70,14 +70,20 @@ def test_get_events_returns_events(client: TestClient):
 
 
 def test_get_events_returns_specific_event(client):
-    response = client.get(f"/events/1")
+    response = client.get("/events/1")
     assert response.status_code == 200
     assert response.json()["event"]["id"] == 1
 
-# def test_get_events_returns_specific_event(client):
-#     response = client.get(f"/bookings/1")
-#     assert response.status_code == 200
-#     assert response.json()["booking_id"] == 1
+def test_get_event_not_found_returns_404(client):
+    response = client.get(f"/events/99999")
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "Not Found"
+
+def test_get_event_not_valid_returns_400(client):
+    response = client.get(f"/events/hi")
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "Bad Request"
+
 
 
 # def test_get_booking_not_found_returns_404(client):
