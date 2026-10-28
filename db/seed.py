@@ -2,6 +2,7 @@ import psycopg2
 import json
 from db.connection import get_connection 
 from db.load import load_data
+from utils.passwords import hash_password
 
 
 def drop_data(cursor):
@@ -20,7 +21,7 @@ def create_data(cursor):
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         name VARCHAR(255) NOT NULL,
-        password VARCHAR(255) NOT NULL,
+        hashed_password VARCHAR(255) NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
     );
 
@@ -56,10 +57,10 @@ def create_data(cursor):
 def insert_user_data(user_data, cursor):
 
     for user in user_data:
-        
-        insert_statement = "INSERT INTO users (email, name, password) VALUES (%s, %s, %s);"
+        password = hash_password(user["password"])
+        insert_statement = "INSERT INTO users (email, name, hashed_password) VALUES (%s, %s, %s);"
 
-        cursor.execute(insert_statement,(user["email"], user["name"], user["password"]))
+        cursor.execute(insert_statement,(user["email"], user["name"], password))
 
 
 def insert_venue_data(venue_data, cursor):

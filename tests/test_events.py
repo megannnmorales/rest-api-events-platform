@@ -2,18 +2,18 @@ from starlette.testclient import TestClient
 
 
 def test_get_events_responds_with200(client: TestClient):
-    response = client.get("/events")
+    response = client.get("/api/events")
 
     assert response.status_code == 200
 
 def test_get_events_responds_with_list_on_key_of_events(client: TestClient):
-    events = client.get("/events").json()["events"]
+    events = client.get("/api/events").json()["events"]
 
     assert isinstance(events, list)
 
 
 def test_check_returns_all_events(client: TestClient):
-    result = client.get("/events").json()["events"]
+    result = client.get("/api/events").json()["events"]
     expected = [
     {
         "id": 3,
@@ -64,23 +64,23 @@ def test_check_returns_all_events(client: TestClient):
     assert result == expected
 
 def test_get_events_returns_events(client: TestClient):
-    events = client.get("/events").json()["events"]
+    events = client.get("/api/events").json()["events"]
 
     assert len(events) == 5
 
 
 def test_get_events_returns_specific_event(client):
-    response = client.get("/events/1")
+    response = client.get("/api/events/1")
     assert response.status_code == 200
     assert response.json()["event"]["id"] == 1
 
 def test_get_event_not_found_returns_404(client):
-    response = client.get(f"/events/99999")
+    response = client.get("/api/events/99999")
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "Not Found"
 
 def test_get_event_not_valid_returns_400(client):
-    response = client.get(f"/events/hi")
+    response = client.get("/api/events/hi")
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "Bad Request"
 
