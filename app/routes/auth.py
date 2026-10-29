@@ -12,9 +12,20 @@ def login(body: LoginRequest):
 
     user = get_user(body.email)
 
+    if user is None:
+        raise HTTPException(
+        status_code=401,
+        detail={"code": "Unauthorized", "message": "Invalid email or password"},
+                )
+    
     if verify_password(body.password, user["hashed_password"]):
         return {
             "access_token": create_access_token(user["id"]),
             "token_type": "bearer"
         }
-    return "hello"
+    else:
+        raise HTTPException(
+            status_code=401,
+            detail={"code": "Unauthorized", "message": "Invalid email or password"},
+                        )
+            
