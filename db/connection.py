@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 def get_connection():
 
-    ENV = os.getenv("ENV")
+    ENV = os.getenv("ENV", "development")
     load_dotenv(f".env.{ENV}")
 
     if not os.getenv("PGDATABASE"):

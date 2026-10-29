@@ -1,8 +1,7 @@
 from datetime import datetime, timezone, timedelta
-from utils.config import get_secret
+from utils.config import get_secret, ALGORITHM
 import jwt
 
-ALGORITHM = "HS256"
 
 def create_access_token(id: int) -> str:
     payload = {
@@ -10,4 +9,4 @@ def create_access_token(id: int) -> str:
         "exp": datetime.now(timezone.utc)+timedelta(hours=1)
     }
 
-    jwt.encode(payload, get_secret(), algorithm=ALGORITHM)
+    return jwt.encode(payload, get_secret(), algorithm=ALGORITHM)

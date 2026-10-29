@@ -3,10 +3,12 @@ from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from app.routes.events import events_router
+from app.routes.auth import  auth_router
 
 app = FastAPI()
 
 app.include_router(events_router)
+app.include_router(auth_router)
 
 @app.exception_handler(HTTPException)
 def handle_http_exception(request: Request, exc: HTTPException):
