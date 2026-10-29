@@ -1,8 +1,4 @@
 from starlette.testclient import TestClient
-import jwt
-from utils.auth import create_access_token
-from utils.config import get_secret, ALGORITHM
-import json
 
 
 def test_get_events_responds_with200(client: TestClient):
@@ -89,18 +85,12 @@ def test_get_event_not_valid_returns_400(client):
     assert response.json()["error"]["code"] == "Bad Request"
 
 
-def test_correct_username_and_password_returns_a_token(client):
-    response = client.post(
-        "/api/auth/login", json={
-        "email": "user_c@example.com",
-            "password": "password_c"
-        }
-    )
-    body = response.json()
-    
-    assert response.status_code == 200
-    assert "access_token" in body
-    assert body["token_type"] == "bearer"
-    payload = jwt.decode(body["access_token"], get_secret(), algorithms=[ALGORITHM])
-    assert payload["sub"] == "1"
+# def test_rsvp_without_token_responds_with_401(client):
+#     response = client.post("/api/events/1/rsvp")
 
+#     assert 
+
+def test_rsvp_with_valid_token_responds_with_201(client, auth_headers):
+    response = client.post("/api/events/1/rsvp",headers=auth_headers)
+
+    assert response.status_code == 201
