@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.exceptions import HTTPException
-from db.queries import list_events, get_one_event
+from app.models.events import list_events, get_one_event
 
 events_router = APIRouter(prefix="/api/events")
 

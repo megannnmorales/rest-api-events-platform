@@ -85,8 +85,11 @@ def test_get_event_not_valid_returns_400(client):
     assert response.json()["error"]["code"] == "Bad Request"
 
 
-
-# def test_get_booking_not_found_returns_404(client):
-#     response = client.get("/bookings/999999")
-#     assert response.status_code == 404
-#     assert response.json()["error"]["code"] == "NOT_FOUND"
+def test_correct_username_and_password_returns_a_token(client):
+    response = client.post(
+        "api/auth/login", json={
+        "email": "user_c@example.com",
+            "password": "password_c"
+        }
+    )
+    assert response.status_code == 200
