@@ -33,5 +33,23 @@ class Rsvp(BaseModel):
 class RsvpResponse(BaseModel):
     rsvp: Rsvp
 
+class CreateEvent(BaseModel):
+    title: str
+    description: str
+    starts_at: datetime
+    ends_at: datetime
+    venue_id: int
 
 
+class Event(BaseModel):
+    id: int
+    title: str
+    description: str
+    starts_at: datetime
+    ends_at: datetime
+    venue_id: int
+    organiser_id: int
+    created_at: datetime
+
+class EventCreated(BaseModel):
+    event: Event

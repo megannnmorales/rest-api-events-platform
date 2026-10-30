@@ -30,3 +30,18 @@ def get_one_event(event_id):
     conn.close()
     event = dict(zip(columns, row))
     return event
+
+def create_event(title, description, starts_at, ends_at, venue_id, organiser_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO events (title, description, starts_at, ends_at, organiser_id, venue_at) VALUES (%s, %s) RETURNING *",
+        (title, description, starts_at, ends_at, organiser_id, venue_id)
+    )
+    conn.commit()
+    columns = [desc[0] for desc in cursor.description]
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    event = dict(zip(columns, row))
+    return event
