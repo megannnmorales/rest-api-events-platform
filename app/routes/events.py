@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from app.models.events import list_events, get_one_event, create_event
 from utils.auth import get_current_valid_user_id
-from app.models.schemas import RsvpResponse, CreateEvent, Event
+from app.models.schemas import RsvpResponse, CreateEvent, EventCreated
 from app.models.rsvps import create_rsvp, get_rsvp, delete_rsvp
 
 events_router = APIRouter(prefix="/api/events")
@@ -56,7 +56,7 @@ def user_cancels_rsvp(event_id:int, user_id: int = Depends(get_current_valid_use
         )
     return None
 
-@events_router.post("/", status_code=201, response_model=Event)
+@events_router.post("/", status_code=201, response_model=EventCreated)
 def user_creates_event(body:CreateEvent, organiser_id: int = Depends(get_current_valid_user_id)): 
 
     event = create_event(
@@ -69,3 +69,7 @@ def user_creates_event(body:CreateEvent, organiser_id: int = Depends(get_current
     )
 
     return {"event": event}
+
+for route in events_router.routes:
+    if route.path == "/":
+        print("Registered response model:", route.response_model)

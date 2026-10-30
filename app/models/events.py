@@ -38,9 +38,9 @@ def create_event(title, description, starts_at, ends_at, venue_id, organiser_id)
         "INSERT INTO events (title, description, starts_at, ends_at, organiser_id, venue_id) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *",
         (title, description, starts_at, ends_at, organiser_id, venue_id)
     )
-    conn.commit()
     columns = [desc[0] for desc in cursor.description]
     row = cursor.fetchone()
+    conn.commit()
     cursor.close()
     conn.close()
     event = dict(zip(columns, row))
