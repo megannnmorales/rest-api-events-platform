@@ -1,6 +1,22 @@
 from db.connection import get_connection
 
-def get_user(email):
+def create_user(name, email, hashed_password):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO users (name, email, hashed_password) VALUES (%s, %s, %s) RETURNING *",
+        (name, email, hashed_password)
+    )
+    conn.commit()
+    columns = [desc[0] for desc in cursor.description]
+    row = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    user = dict(zip(columns, row))
+    return user
+
+
+def get_user_by_email(email):
 
     conn = get_connection()
 
@@ -16,3 +32,4 @@ def get_user(email):
     user = dict(zip(columns, row))
 
     return user
+

@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi.exceptions import HTTPException
-from app.models.schemas import LoginRequest, Token
-from utils.passwords import verify_password
-from app.models.users import get_user
+from app.models.schemas import LoginRequest, Token, RegisterUser
+from utils.passwords import hash_password, verify_password
+from app.models.users import get_user, create_user
 from utils.auth import create_access_token
 
 auth_router = APIRouter(prefix="/api/auth")
@@ -27,4 +27,12 @@ def login(body: LoginRequest):
         }
     
     raise unauthorised
-            
+
+@auth_router.post("/register", status_code=201)
+def register_new_user(body: RegisterUser):
+    hashed_password = hash_password(body.password)
+    
+    user = create_user(body.name, body.email, hashed_password)
+
+    return {"user":user}
+
