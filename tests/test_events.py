@@ -88,7 +88,7 @@ def test_get_event_not_valid_returns_400(client):
     assert response.json()["error"]["code"] == "Bad Request"
 
 
-def test_rsvp_with_valid_token(client, auth_headers):
+def test_rsvp_created_with_valid_token(client, auth_headers):
     response = client.post("/api/events/1/rsvp",headers=auth_headers)
     
     assert response.status_code == 201
@@ -99,13 +99,13 @@ def test_rsvp_with_valid_token(client, auth_headers):
     assert rsvp ["event_id"] == 1
 
 
-def test_rsvp_with_missing_token(client):
+def test_create_rsvp_with_missing_token_returns_401(client):
     response = client.post("/api/events/1/rsvp")
 
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "Unauthorized"
 
-def test_rsvp_with_expired_token(client):
+def test_create_rsvp_with_expired_token_returns_401(client):
 
     payload = {
         "sub": "1",
@@ -151,3 +151,56 @@ def test_cancelling_a_non_existent_rsvp_returns_404(client, auth_headers):
     response = client.delete("api/events/1/rsvp/me", headers=auth_headers)
 
     assert response.status_code == 404
+
+
+
+def test_create_created_with_valid_token(client, auth_headers):
+    response = client.post("/api/events", json= {
+  "title": "Summer Rooftop Social",
+  "description": "An evening of networking and good vibes.",
+  "starts_at": "2025-08-15T18:00:00Z",
+  "ends_at": "2025-08-15T21:00:00Z",
+  "venue_id": 2
+}
+ , headers=auth_headers)
+    
+    assert response.status_code == 201
+    body = response.json()
+    event = body["event"]
+    assert isinstance (event,dict)
+    assert event["organiser_id"] == 2
+    assert event["id"] == 6
+
+def test_create_event_with_missing_token_returns_401(client):
+    response = client.post("/api/events")
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "Unauthorized"
+
+def test_create_event_with_expired_token_returns_401(client):
+
+    payload = {
+        "sub": "1",
+        "exp": datetime.now(timezone.utc) - timedelta(hours=1)
+    }
+    token = jwt.encode(payload, get_secret(), algorithm=ALGORITHM)
+
+    response = client.post(
+        "/api/events",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 401
+
+def test_malformed_event_field_returns_400(client, auth_headers):
+    response = client.post(
+        "/api/events",
+        json={
+            "name": "Python Workshop",
+            "description": "Learn Python",
+            "date": "not-a-date"
+        },
+        headers=auth_headers
+    )
+
+    assert response.status_code == 400

@@ -35,7 +35,7 @@ def create_event(title, description, starts_at, ends_at, venue_id, organiser_id)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO events (title, description, starts_at, ends_at, organiser_id, venue_at) VALUES (%s, %s) RETURNING *",
+        "INSERT INTO events (title, description, starts_at, ends_at, organiser_id, venue_id) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *",
         (title, description, starts_at, ends_at, organiser_id, venue_id)
     )
     conn.commit()
