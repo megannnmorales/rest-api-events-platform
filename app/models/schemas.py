@@ -14,6 +14,16 @@ class RegisterUser(BaseModel):
   email: str
   password: str
 
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+    created_at: datetime
+
+class UserRegistered(BaseModel):
+    user: User
+
+
 class Rsvp(BaseModel):
     id: int
     attendee_id: int

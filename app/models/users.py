@@ -15,6 +15,19 @@ def create_user(name, email, hashed_password):
     user = dict(zip(columns, row))
     return user
 
+# def get_user_without_password(user_id):
+#     conn = get_connection()
+    
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT id, name, email, created_at FROM users WHERE id = %s", (user_id,))
+    
+#     columns = [desc[0] for desc in cursor.description]
+#     row = cursor.fetchone()
+#     if row is None:
+#             return None
+#     cursor.close()
+#     conn.close()
+#     user = dict(zip(columns, row))
 
 def get_user_by_email(email):
 
