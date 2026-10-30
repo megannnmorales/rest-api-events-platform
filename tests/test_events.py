@@ -141,8 +141,13 @@ def test_successfully_cancelled_rsvp_responds_with_204(client, auth_headers):
 
     assert response.status_code == 204
 
-def test_without_a_valid_token_return_401(client):
+def test_without_a_valid_token_returns_401(client):
     response = client.delete("api/events/1/rsvp/me")
 
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "Unauthorized"
+
+def test_cancelling_a_non_existent_rsvp_returns_404(client, auth_headers):
+    response = client.delete("api/events/1/rsvp/me", headers=auth_headers)
+
+    assert response.status_code == 404
