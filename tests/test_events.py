@@ -90,7 +90,18 @@ def test_get_event_not_valid_returns_400(client):
 
 #     assert 
 
-def test_rsvp_with_valid_token_responds_with_201(client, auth_headers):
+def test_rsvp_with_valid_token(client, auth_headers):
     response = client.post("/api/events/1/rsvp",headers=auth_headers)
-
+    
     assert response.status_code == 201
+    body = response.json()
+    rsvp = body["rsvp"]
+    assert isinstance (rsvp,dict)
+    assert rsvp["attendee_id"] == 1
+    assert rsvp ["event_id"] == 1
+
+
+def test_rsvp_with_missing_token(client):
+    response = client.post("/api/events/1/rsvp")
+
+    assert response.status_code == 401

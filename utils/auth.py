@@ -18,10 +18,10 @@ bearer_scheme = HTTPBearer(auto_error=False)
 def get_current_valid_user_id(credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme)):
 
     unauthorised = HTTPException(
-        status_code=401,
-        detail="Not authenticated",
-        headers={"WWWW-Authenticate": "Bearer"},
-    )
+    status_code=401,
+    detail={"code": "Unauthorized", "message": "Missing or invalid token"},
+    headers={"WWW-Authenticate": "Bearer"},
+)
 
     if credentials is None:
         raise unauthorised

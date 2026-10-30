@@ -28,6 +28,13 @@ def get_event(id:int):
 
 @events_router.post("/{id}/rsvp", status_code=201, response_model=RsvpResponse)
 def user_rsvp_to_event(id:int, user_id: int = Depends(get_current_valid_user_id,)):
+
+    # if user_id is None:
+    #     raise HTTPException(
+    #                 status_code=401,
+    #                 detail={"code": "Unauthorized", "message": "Not authenticated"},
+    #             )
+    
     rsvp = create_rsvp(user_id, id)
     
     return {"rsvp":rsvp}
