@@ -1,4 +1,7 @@
 from starlette.testclient import TestClient
+import jwt
+from datetime import datetime, timezone, timedelta
+from utils.config import get_secret, ALGORITHM
 
 
 def test_get_events_responds_with200(client: TestClient):
@@ -85,11 +88,6 @@ def test_get_event_not_valid_returns_400(client):
     assert response.json()["error"]["code"] == "Bad Request"
 
 
-# def test_rsvp_without_token_responds_with_401(client):
-#     response = client.post("/api/events/1/rsvp")
-
-#     assert 
-
 def test_rsvp_with_valid_token(client, auth_headers):
     response = client.post("/api/events/1/rsvp",headers=auth_headers)
     
@@ -105,3 +103,33 @@ def test_rsvp_with_missing_token(client):
     response = client.post("/api/events/1/rsvp")
 
     assert response.status_code == 401
+    assert response.json()["error"]["code"] == "Unauthorized"
+
+def test_rsvp_with_expired_token(client):
+
+    payload = {
+        "sub": "1",
+        "exp": datetime.now(timezone.utc) - timedelta(hours=1)
+    }
+    token = jwt.encode(payload, get_secret(), algorithm=ALGORITHM)
+
+    response = client.post(
+        "/api/events/1/rsvp",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+
+    assert response.status_code == 401
+
+
+def test_rsvp_to_missing_event_responds_with_404(client, auth_headers):
+    response = client.post("/api/events/9999/rsvp", headers=auth_headers)
+
+    assert response.status_code == 404
+
+def test_duplicate_rsvp_responds_with_409(client, auth_headers):
+    client.post("/api/events/1/rsvp", headers=auth_headers) 
+
+    response = client.post("/api/events/1/rsvp", headers=auth_headers) 
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "Conflict"

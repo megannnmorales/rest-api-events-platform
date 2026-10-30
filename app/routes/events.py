@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from app.models.events import list_events, get_one_event
 from utils.auth import get_current_valid_user_id
 from app.models.schemas import RsvpResponse
-from app.models.rsvps import create_rsvp
+from app.models.rsvps import create_rsvp, get_rsvp
 
 events_router = APIRouter(prefix="/api/events")
 
@@ -14,9 +14,9 @@ def get_events():
     return {"events": events}
 
 
-@events_router.get("/{id}")
-def get_event(id:int):
-    event = get_one_event(id)
+@events_router.get("/{event_id}")
+def get_event(event_id:int):
+    event = get_one_event(event_id)
     if event is None:
         raise HTTPException(
             status_code=404,
@@ -26,15 +26,21 @@ def get_event(id:int):
     return {"event": event}
 
 
-@events_router.post("/{id}/rsvp", status_code=201, response_model=RsvpResponse)
-def user_rsvp_to_event(id:int, user_id: int = Depends(get_current_valid_user_id,)):
+@events_router.post("/{event_id}/rsvp", status_code=201, response_model=RsvpResponse)
+def user_rsvp_to_event(event_id:int, user_id: int = Depends(get_current_valid_user_id)):
+    event = get_one_event(event_id)
+    if event is None:
+        raise HTTPException(
+        status_code=404,
+        detail={"code": "Not Found", "message": "Event not found"},
+        )
 
-    # if user_id is None:
-    #     raise HTTPException(
-    #                 status_code=401,
-    #                 detail={"code": "Unauthorized", "message": "Not authenticated"},
-    #             )
+    rsvp = get_rsvp(user_id, event_id)
+    if rsvp is not None:  
+        raise HTTPException(
+        status_code=409,
+        detail={"code": "Conflict", "message": "Duplicate RSVP"},
+        )
     
-    rsvp = create_rsvp(user_id, id)
-    
+    rsvp = create_rsvp(user_id, event_id)
     return {"rsvp":rsvp}
