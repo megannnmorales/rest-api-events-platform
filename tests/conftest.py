@@ -15,7 +15,7 @@ def seed_test_db():
 
 @pytest.fixture
 def auth_headers():
-    token = create_access_token(1)
+    token = create_access_token(2)
     return {"Authorization": f"Bearer {token}"}
 
 @pytest.fixture()

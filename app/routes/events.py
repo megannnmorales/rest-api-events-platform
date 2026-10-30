@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from app.models.events import list_events, get_one_event
 from utils.auth import get_current_valid_user_id
 from app.models.schemas import RsvpResponse
-from app.models.rsvps import create_rsvp, get_rsvp
+from app.models.rsvps import create_rsvp, get_rsvp, delete_rsvp
 
 events_router = APIRouter(prefix="/api/events")
 
@@ -44,3 +44,14 @@ def user_rsvp_to_event(event_id:int, user_id: int = Depends(get_current_valid_us
     
     rsvp = create_rsvp(user_id, event_id)
     return {"rsvp":rsvp}
+
+@events_router.delete("/{event_id}/rsvp/me", status_code=204)
+def user_cancels_rsvp(event_id:int, user_id: int = Depends(get_current_valid_user_id)):
+    deleted = delete_rsvp(user_id, event_id)
+
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "Not Found", "message": "RSVP not found"},
+        )
+    return None

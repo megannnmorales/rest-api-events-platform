@@ -95,7 +95,7 @@ def test_rsvp_with_valid_token(client, auth_headers):
     body = response.json()
     rsvp = body["rsvp"]
     assert isinstance (rsvp,dict)
-    assert rsvp["attendee_id"] == 1
+    assert rsvp["attendee_id"] == 2
     assert rsvp ["event_id"] == 1
 
 
@@ -133,3 +133,16 @@ def test_duplicate_rsvp_responds_with_409(client, auth_headers):
 
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "Conflict"
+
+def test_successfully_cancelled_rsvp_responds_with_204(client, auth_headers):
+    client.post("/api/events/1/rsvp", headers=auth_headers)
+    
+    response = client.delete("api/events/1/rsvp/me", headers=auth_headers)
+
+    assert response.status_code == 204
+
+def test_without_a_valid_token_return_401(client):
+    response = client.delete("api/events/1/rsvp/me")
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "Unauthorized"

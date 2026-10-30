@@ -29,3 +29,19 @@ def get_rsvp(user_id, event_id):
     conn.close()
     rsvp = dict(zip(columns, row))
     return rsvp    
+
+def delete_rsvp(user_id, event_id):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "DELETE FROM rsvps WHERE attendee_id = %s AND event_id = %s",
+            (user_id, event_id)
+        )
+        deleted = cursor.rowcount == 1
+        conn.commit()
+        return deleted
+    finally: 
+        cursor.close()
+        conn.close()
+    
