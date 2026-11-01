@@ -113,7 +113,12 @@ def user_changes_event(event_id: int, body: ChangeEvent, user_id: int = Depends(
 
 @events_router.get("/{event_id}/attendees", response_model=AttendeesResponse)
 def get_event_attendees(event_id:int, user_id: int = Depends(get_current_valid_user_id)):
-    
+    event = get_one_event(event_id)
+    if event is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "Not Found", "message": "Event not found"},
+            )
     event_organiser = get_event_organiser(event_id)
     
     if event_organiser["organiser_id"] != user_id:

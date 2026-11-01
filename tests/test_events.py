@@ -378,3 +378,43 @@ def test_get_attendees_valid_event_and_user_returns_list_of_attendees(client, au
     response = client.get("/api/events/2/attendees", headers=auth_headers)
     
     assert response.status_code == 200
+    body = response.json()
+    assert body["attendees"][0]["name"] == "user_b"
+    assert body["attendees"][0]["email"] == "user_b@example.com"
+
+def test_get_attendees_no_token(client):
+    response = client.get("/api/events/2/attendees")
+
+    assert response.status_code == 401
+
+
+def test_get_attendees_invalid_token(client):
+    response = client.get(
+        "/api/events/2/attendees",
+        headers={"Authorization": "Bearer not-a-real-token"},
+    )
+
+    assert response.status_code == 401
+
+
+def test_get_attendees_not_organiser(client, other_user_headers):
+    response = client.get("/api/events/2/attendees", headers=other_user_headers)
+
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "Forbidden"
+
+
+def test_get_attendees_no_password_in_response(client, auth_headers):
+    response = client.get("/api/events/2/attendees", headers=auth_headers)
+
+    assert response.status_code == 200
+    for attendee in response.json()["attendees"]:
+        assert "password" not in attendee
+
+
+def test_get_attendees_event_not_found(client, auth_headers):
+    response = client.get("/api/events/9999/attendees", headers=auth_headers)
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "Not Found"
+
