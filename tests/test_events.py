@@ -397,8 +397,8 @@ def test_get_attendees_invalid_token(client):
     assert response.status_code == 401
 
 
-def test_get_attendees_not_organiser(client, other_user_headers):
-    response = client.get("/api/events/2/attendees", headers=other_user_headers)
+def test_get_attendees_not_organiser(client, other_auth_headers):
+    response = client.get("/api/events/2/attendees", headers=other_auth_headers)
 
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "Forbidden"
@@ -418,3 +418,12 @@ def test_get_attendees_event_not_found(client, auth_headers):
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "Not Found"
 
+# ---  GET /api/user/me/events ---
+
+def test_get_my_events_success(client, auth_headers):
+    response = client.get("/api/user/me/events", headers=auth_headers)
+    print(response.json())
+    assert response.status_code == 200, response.text
+    events = response.json()["events"]
+
+    assert events[0]["title"] == "event_e"

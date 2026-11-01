@@ -71,3 +71,14 @@ class Attendee(BaseModel):
 
 class AttendeesResponse(BaseModel):
     attendees: list[Attendee]
+
+class MyRsvpEvent(BaseModel):
+    id: int
+    title: str
+    starts_at: datetime
+    rsvp_date: datetime
+    event_rank: int
+    total_rsvps: int
+
+class MyRsvpEventsResponse(BaseModel):
+    events: list[MyRsvpEvent]
