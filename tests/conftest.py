@@ -18,6 +18,11 @@ def auth_headers():
     token = create_access_token(2)
     return {"Authorization": f"Bearer {token}"}
 
+@pytest.fixture
+def other_auth_headers():
+    token = create_access_token(3)
+    return {"Authorization": f"Bearer {token}"}
+
 @pytest.fixture()
 def client():
     return TestClient(app)

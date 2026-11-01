@@ -56,9 +56,9 @@ class EventCreated(BaseModel):
 
 
 class ChangeEvent(BaseModel):
-    description: str
-    starts_at: datetime
-    ends_at: datetime
+    description: str | None = None
+    starts_at: datetime | None = None
+    ends_at: datetime | None = None
 
 class EventChanged(BaseModel):
     event: Event

@@ -3,7 +3,7 @@ import jwt
 from datetime import datetime, timezone, timedelta
 from utils.config import get_secret, ALGORITHM
 
-
+# --- GET /api/events ---
 def test_get_events_responds_with200(client: TestClient):
     response = client.get("/api/events")
 
@@ -71,7 +71,7 @@ def test_get_events_returns_events(client: TestClient):
 
     assert len(events) == 5
 
-
+# --- GET /api/events/:id ---
 def test_get_events_returns_specific_event(client):
     response = client.get("/api/events/1")
     assert response.status_code == 200
@@ -87,6 +87,7 @@ def test_get_event_not_valid_returns_400(client):
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "Bad Request"
 
+# --- POST /api/events/:id/rsvp ---
 
 def test_rsvp_created_with_valid_token(client, auth_headers):
     response = client.post("/api/events/1/rsvp",headers=auth_headers)
@@ -134,6 +135,7 @@ def test_duplicate_rsvp_responds_with_409(client, auth_headers):
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "Conflict"
 
+# --- DELETE /api/events/:id/rsvp/me ---
 def test_successfully_cancelled_rsvp_responds_with_204(client, auth_headers):
     client.post("/api/events/1/rsvp", headers=auth_headers)
     
@@ -152,7 +154,7 @@ def test_cancelling_a_non_existent_rsvp_returns_404(client, auth_headers):
 
     assert response.status_code == 404
 
-
+# --- POST /api/events ---
 
 def test_create_event_with_valid_token(client, auth_headers):
     response = client.post("/api/events", json= {
@@ -242,7 +244,7 @@ def test_create_event_with_invalid_dates(client, auth_headers):
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "Bad Request"
 
-
+# ---  PATCH/api/events ---
 def test_change_event_is_successful(client, auth_headers):
     client.post(
         "/api/events/",
@@ -266,3 +268,105 @@ def test_change_event_is_successful(client, auth_headers):
             )
     assert response.status_code == 200
     assert response.json()["event"]["description"] == "A morning of networking and good vibes."
+
+
+def test_change_event_is_successful_with_one_parameter(client, auth_headers):
+    client.post(
+        "/api/events/",
+        headers=auth_headers,
+        json={
+            "title": "Summer Rooftop Social",
+            "description": "An evening of networking and good vibes.",
+            "starts_at": "2026-11-15T19:00:00Z",
+            "ends_at": "2026-11-15T21:00:00Z",
+            "venue_id": 2
+            }
+        )
+    response = client.patch(
+        "/api/events/6",
+        headers=auth_headers,
+        json={
+            "description": "A morning of networking and good vibes.",
+            "starts_at": "2026-11-15T19:00:00Z",
+            "ends_at": "2026-11-15T21:00:00Z"
+                }
+            )
+    assert response.status_code == 200
+    assert response.json()["event"]["description"] == "A morning of networking and good vibes."
+
+
+def test_change_event_ends_before_starts(client, auth_headers):
+    response = client.patch(
+        "/api/events/2",
+        headers=auth_headers,
+        json={
+            "starts_at": "2026-11-15T21:00:00Z",
+            "ends_at": "2026-11-15T18:00:00Z",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "Bad Request"
+
+
+def test_change_event_ends_equal_to_starts(client, auth_headers):
+    response = client.patch(
+        "/api/events/2",
+        headers=auth_headers,
+        json={
+            "starts_at": "2026-11-15T18:00:00Z",
+            "ends_at": "2026-11-15T18:00:00Z",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "Bad Request"
+
+def test_patch_event_only_ends_at_before_existing_start(client, auth_headers):
+    response = client.patch(
+        "/api/events/2",
+        headers=auth_headers,
+        json={"ends_at": "2000-01-01T00:00:00Z"},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "Bad Request"
+
+def test_change_event_not_organiser(client, other_auth_headers):
+    response = client.patch(
+        "/api/events/2",
+        headers=other_auth_headers,
+        json={"description": "Trying to change someone else's event"},
+    )
+
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "Forbidden"
+
+def test_change_event_not_found(client, auth_headers):
+    response = client.patch(
+        "/api/events/9999",
+        headers=auth_headers,
+        json={"description": "This event doesn't exist"},
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "Not Found"
+
+
+def test_change_event_no_token(client):
+    response = client.patch(
+        "/api/events/1",
+        json={"description": "No token sent"},
+    )
+
+    assert response.status_code == 401
+
+
+def test_change_event_invalid_token(client):
+    response = client.patch(
+        "/api/events/1",
+        headers={"Authorization": "Bearer not-a-real-token"},
+        json={"description": "Bad token sent"},
+    )
+
+    assert response.status_code == 401

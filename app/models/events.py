@@ -61,11 +61,13 @@ def create_event(title, description, starts_at, ends_at, venue_id, organiser_id)
     event = dict(zip(columns, row))
     return event
 
-def change_event(event_id, description, starts_at, ends_at):
+def change_event(event_id, description=None, starts_at=None, ends_at=None):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""UPDATE events 
-    SET description = %s, starts_at = %s, ends_at = %s 
+    SET description = COALESCE(%s, description), 
+        starts_at = COALESCE(%s, starts_at), 
+        ends_at = COALESCE(%s, ends_at) 
     WHERE id = %s 
     RETURNING *""",
     (description, starts_at, ends_at, event_id)
