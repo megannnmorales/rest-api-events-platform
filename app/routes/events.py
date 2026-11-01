@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
-from app.models.events import list_events, get_one_event, create_event, change_event, get_event_organiser
+from app.models.events import list_events, get_one_event, create_event, change_event, get_event_organiser, list_attendees
 from utils.auth import get_current_valid_user_id
-from app.models.schemas import RsvpResponse, CreateEvent, EventCreated, ChangeEvent, EventChanged
+from app.models.schemas import RsvpResponse, CreateEvent, EventCreated, ChangeEvent, EventChanged, AttendeesResponse
 from app.models.rsvps import create_rsvp, get_rsvp, delete_rsvp
 
 events_router = APIRouter(prefix="/api/events")
@@ -72,7 +72,7 @@ def user_creates_event(body:CreateEvent, organiser_id: int = Depends(get_current
 
 
 @events_router.patch("/{event_id}", response_model=EventChanged)
-def user_changes_event(event_id: int, body: ChangeEvent, organiser_id: int = Depends(get_current_valid_user_id)):
+def user_changes_event(event_id: int, body: ChangeEvent, user_id: int = Depends(get_current_valid_user_id)):
     event = get_one_event(event_id)
     if event is None:
         raise HTTPException(
@@ -83,7 +83,7 @@ def user_changes_event(event_id: int, body: ChangeEvent, organiser_id: int = Dep
     
     event_organiser = get_event_organiser(event_id)
 
-    if event_organiser["organiser_id"] != organiser_id:
+    if event_organiser["organiser_id"] != user_id:
         raise HTTPException(
             status_code=403,
             detail={"code": "Forbidden", "message": "You do not have access to change this event"},
@@ -109,3 +109,19 @@ def user_changes_event(event_id: int, body: ChangeEvent, organiser_id: int = Dep
     updated_event = change_event(event_id, body.description, body.starts_at, body.ends_at)
 
     return {"event": updated_event} 
+
+
+@events_router.get("/{event_id}/attendees", response_model=AttendeesResponse)
+def get_event_attendees(event_id:int, user_id: int = Depends(get_current_valid_user_id)):
+    
+    event_organiser = get_event_organiser(event_id)
+    
+    if event_organiser["organiser_id"] != user_id:
+        raise HTTPException(
+            status_code=403,
+            detail={"code": "Forbidden", "message": "You do not have access to this attendee list"},
+        )
+
+    attendees = list_attendees(event_id) 
+
+    return {"attendees": attendees}

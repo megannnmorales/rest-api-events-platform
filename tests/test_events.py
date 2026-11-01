@@ -370,3 +370,11 @@ def test_change_event_invalid_token(client):
     )
 
     assert response.status_code == 401
+
+
+# ---  GET/api/events/:id/attendees ---
+
+def test_get_attendees_valid_event_and_user_returns_list_of_attendees(client, auth_headers):
+    response = client.get("/api/events/2/attendees", headers=auth_headers)
+    
+    assert response.status_code == 200

@@ -81,3 +81,18 @@ def change_event(event_id, description=None, starts_at=None, ends_at=None):
     conn.close()
     event = dict(zip(columns, row))
     return event
+
+
+def list_attendees(event_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""SELECT rsvps.attendee_id AS id, users.name, users.email
+    FROM rsvps
+    JOIN users ON rsvps.attendee_id = users.id
+    WHERE rsvps.event_id = %s""", (event_id,))
+    columns = [desc[0] for desc in cursor.description]
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    attendees = [dict(zip(columns, row)) for row in rows]
+    return attendees

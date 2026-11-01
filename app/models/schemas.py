@@ -62,3 +62,12 @@ class ChangeEvent(BaseModel):
 
 class EventChanged(BaseModel):
     event: Event
+
+
+class Attendee(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+
+class AttendeesResponse(BaseModel):
+    attendees: list[Attendee]
