@@ -31,6 +31,21 @@ def get_one_event(event_id):
     event = dict(zip(columns, row))
     return event
 
+def get_event_organiser(event_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""SELECT events.organiser_id
+    FROM events
+    WHERE events.id = %s""", (event_id,))
+    columns = [desc[0] for desc in cursor.description]
+    row = cursor.fetchone()
+    if row is None:
+        return None
+    cursor.close()
+    conn.close()
+    event_organiser = dict(zip(columns, row))
+    return event_organiser
+
 def create_event(title, description, starts_at, ends_at, venue_id, organiser_id):
     conn = get_connection()
     cursor = conn.cursor()
@@ -40,6 +55,25 @@ def create_event(title, description, starts_at, ends_at, venue_id, organiser_id)
     )
     columns = [desc[0] for desc in cursor.description]
     row = cursor.fetchone()
+    conn.commit()
+    cursor.close()
+    conn.close()
+    event = dict(zip(columns, row))
+    return event
+
+def change_event(event_id, description, starts_at, ends_at):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""UPDATE events 
+    SET description = %s, starts_at = %s, ends_at = %s 
+    WHERE id = %s 
+    RETURNING *""",
+    (description, starts_at, ends_at, event_id)
+    )
+    columns = [desc[0] for desc in cursor.description]
+    row = cursor.fetchone()
+    if row is None:
+        return None
     conn.commit()
     cursor.close()
     conn.close()

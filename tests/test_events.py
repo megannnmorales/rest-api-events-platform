@@ -225,3 +225,44 @@ def test_create_event_with_valid_iso_dates(client, auth_headers):
     assert datetime.fromisoformat(
     event["starts_at"].replace("Z", "+00:00")
     ) == datetime.fromisoformat("2026-11-15T18:00:00+00:00")
+
+def test_create_event_with_invalid_dates(client, auth_headers):
+    response = client.post(
+    "/api/events/",
+    headers=auth_headers,
+    json={
+        "title": "Summer Rooftop Social",
+        "description": "An evening of networking and good vibes.",
+        "starts_at": "not-a-date",
+        "ends_at": "2026-11-15T21:00:00Z",
+        "venue_id": 2
+        }
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"]["code"] == "Bad Request"
+
+
+def test_change_event_is_successful(client, auth_headers):
+    client.post(
+        "/api/events/",
+        headers=auth_headers,
+        json={
+            "title": "Summer Rooftop Social",
+            "description": "An evening of networking and good vibes.",
+            "starts_at": "2026-11-15T19:00:00Z",
+            "ends_at": "2026-11-15T21:00:00Z",
+            "venue_id": 2
+            }
+        )
+    response = client.patch(
+        "/api/events/6",
+        headers=auth_headers,
+        json={
+            "description": "A morning of networking and good vibes.",
+            "starts_at": "2026-11-15T11:00:00Z",
+            "ends_at": "2026-11-15T12:00:00Z",
+                }
+            )
+    assert response.status_code == 200
+    assert response.json()["event"]["description"] == "A morning of networking and good vibes."

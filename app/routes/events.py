@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
-from app.models.events import list_events, get_one_event, create_event
+from app.models.events import list_events, get_one_event, create_event, change_event, get_event_organiser
 from utils.auth import get_current_valid_user_id
-from app.models.schemas import RsvpResponse, CreateEvent, EventCreated
+from app.models.schemas import RsvpResponse, CreateEvent, EventCreated, ChangeEvent, EventChanged
 from app.models.rsvps import create_rsvp, get_rsvp, delete_rsvp
 
 events_router = APIRouter(prefix="/api/events")
@@ -70,6 +70,16 @@ def user_creates_event(body:CreateEvent, organiser_id: int = Depends(get_current
 
     return {"event": event}
 
-for route in events_router.routes:
-    if route.path == "/":
-        print("Registered response model:", route.response_model)
+
+@events_router.patch("/{event_id}", response_model=EventChanged)
+def user_changes_event(event_id: int, body: ChangeEvent, organiser_id: int = Depends(get_current_valid_user_id)):
+    event_organiser = get_event_organiser(event_id)
+
+    if event_organiser["organiser_id"] != organiser_id:
+        raise HTTPException(
+                    status_code=403,
+                    detail={"code": "Forbidden", "message": "You do not have access to change this event"},
+                ) 
+    updated_event = change_event(event_id, body.description, body.starts_at, body.ends_at)
+
+    return {"event": updated_event} 

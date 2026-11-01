@@ -53,3 +53,12 @@ class Event(BaseModel):
 
 class EventCreated(BaseModel):
     event: Event
+
+
+class ChangeEvent(BaseModel):
+    description: str
+    starts_at: datetime
+    ends_at: datetime
+
+class EventChanged(BaseModel):
+    event: Event
