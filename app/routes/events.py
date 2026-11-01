@@ -31,15 +31,15 @@ def user_rsvp_to_event(event_id:int, user_id: int = Depends(get_current_valid_us
     event = get_one_event(event_id)
     if event is None:
         raise HTTPException(
-        status_code=404,
-        detail={"code": "Not Found", "message": "Event not found"},
+            status_code=404,
+            detail={"code": "Not Found", "message": "Event not found"},
         )
 
     rsvp = get_rsvp(user_id, event_id)
     if rsvp is not None:  
         raise HTTPException(
-        status_code=409,
-        detail={"code": "Conflict", "message": "Duplicate RSVP"},
+            status_code=409,
+            detail={"code": "Conflict", "message": "Duplicate RSVP"},
         )
     
     rsvp = create_rsvp(user_id, event_id)
@@ -75,36 +75,36 @@ def user_creates_event(body:CreateEvent, organiser_id: int = Depends(get_current
 def user_changes_event(event_id: int, body: ChangeEvent, organiser_id: int = Depends(get_current_valid_user_id)):
     event = get_one_event(event_id)
     if event is None:
-            raise HTTPException(
+        raise HTTPException(
             status_code=404,
             detail={"code": "Not Found", "message": "Event not found"},
-            )
+        )
     
     
     event_organiser = get_event_organiser(event_id)
 
     if event_organiser["organiser_id"] != organiser_id:
         raise HTTPException(
-                    status_code=403,
-                    detail={"code": "Forbidden", "message": "You do not have access to change this event"},
-                ) 
+            status_code=403,
+            detail={"code": "Forbidden", "message": "You do not have access to change this event"},
+        ) 
 
-    if body.starts_at != None and body.ends_at != None and body.starts_at >= body.ends_at: 
+    if body.starts_at is not None and body.ends_at is not None and body.starts_at >= body.ends_at: 
          raise HTTPException(
-                    status_code=400,
-                    detail={"code": "Bad Request", "message": "Start time cannot be after end time"},
-                )
+            status_code=400,
+            detail={"code": "Bad Request", "message": "Start time cannot be after end time"},
+        )
 
-    if body.starts_at != None and body.ends_at == None and body.starts_at >= event["ends_at"]:
+    if body.starts_at is not None and body.ends_at is None and body.starts_at >= event["ends_at"]:
         raise HTTPException(
-                        status_code=400,
-                        detail={"code": "Bad Request", "message": "Start time cannot be after end time"},
-                    )
-    if body.starts_at == None and body.ends_at != None and event["starts_at"] >= body.ends_at and body.starts_at == None:
+            status_code=400,
+            detail={"code": "Bad Request", "message": "Start time cannot be after end time"},
+        )
+    if body.starts_at is None and body.ends_at is not None and event["starts_at"] >= body.ends_at:
         raise HTTPException(
-                        status_code=400,
-                        detail={"code": "Bad Request", "message": "Start time cannot be after end time"},
-                    )
+            status_code=400,
+            detail={"code": "Bad Request", "message": "Start time cannot be after end time"},
+        )
        
     updated_event = change_event(event_id, body.description, body.starts_at, body.ends_at)
 
