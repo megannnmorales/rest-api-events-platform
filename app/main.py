@@ -5,12 +5,14 @@ from fastapi.encoders import jsonable_encoder
 from app.routes.events import events_router
 from app.routes.auth import  auth_router
 from app.routes.user import user_router
+from app.routes.organisers import organisers_router
 
 app = FastAPI()
 
 app.include_router(events_router)
 app.include_router(auth_router)
 app.include_router(user_router)
+app.include_router(organisers_router)
 
 @app.exception_handler(HTTPException)
 def handle_http_exception(request: Request, exc: HTTPException):

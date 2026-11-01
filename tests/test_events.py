@@ -423,9 +423,8 @@ def test_get_attendees_event_not_found(client, auth_headers):
 def test_get_my_events_success(client, auth_headers):
     response = client.get("/api/user/me/events", headers=auth_headers)
     print(response.json())
-    assert response.status_code == 200, response.text
+    assert response.status_code == 200
     events = response.json()["events"]
-
     assert events[0]["title"] == "event_e"
 
 
@@ -458,3 +457,50 @@ def test_get_my_events_invalid_token(client):
     )
 
     assert response.status_code == 401
+
+
+# --- GET organiser stats ---
+
+def test_get_organiser_stats_success(client):
+    response = client.get("/api/organisers/2/stats")
+
+    assert response.status_code == 200, response.text
+    stats = response.json()["stats"]
+    assert stats["name"] == "user_a"
+
+
+def test_get_organiser_stats_values_are_accurate(client):
+    response = client.get("/api/organisers/2/stats")
+
+    stats = response.json()["stats"]
+  
+    assert stats["organiser_id"] == 2
+    assert stats["total_events"] == 2
+    assert stats["avg_attendance"] == 0.5
+    assert stats["best_attended_count"] == 1
+
+
+def test_get_organiser_stats_avg_attendance_one_decimal(client):
+    response = client.get("/api/organisers/1/stats")
+
+    stats = response.json()["stats"]
+    assert stats["avg_attendance"] == round(stats["avg_attendance"], 1)
+
+
+def test_get_organiser_stats_rank(client):
+    response = client.get("/api/organisers/1/stats")
+
+    stats = response.json()["stats"]
+    assert stats["organiser_rank"] == 3
+
+
+def test_get_organiser_stats_organiser_not_found(client):
+    response = client.get("/api/organisers/9999/stats")
+
+    assert response.status_code == 404
+
+
+def test_get_organiser_stats_organiser_has_no_events(client):
+    response = client.get("/api/organisers/4/stats")
+
+    assert response.status_code == 404

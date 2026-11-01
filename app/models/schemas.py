@@ -82,3 +82,15 @@ class MyRsvpEvent(BaseModel):
 
 class MyRsvpEventsResponse(BaseModel):
     events: list[MyRsvpEvent]
+
+
+class OrganiserStats(BaseModel):
+    organiser_id: int
+    name: str
+    total_events: int
+    avg_attendance: float
+    best_attended_count: int
+    organiser_rank: int
+
+class OrganiserStatsResponse(BaseModel):
+    stats: OrganiserStats
