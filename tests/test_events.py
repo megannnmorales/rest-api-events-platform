@@ -427,3 +427,34 @@ def test_get_my_events_success(client, auth_headers):
     events = response.json()["events"]
 
     assert events[0]["title"] == "event_e"
+
+
+def test_get_my_events_ordered_by_starts_at_ascending(client, auth_headers):
+    response = client.get("/api/user/me/events", headers=auth_headers)
+
+    events = response.json()["events"]
+    starts = [event["starts_at"] for event in events]
+    assert starts == sorted(starts)
+
+
+def test_get_my_events_event_rank_and_total_rsvps(client, auth_headers):
+    response = client.get("/api/user/me/events", headers=auth_headers)
+
+    events = response.json()["events"]
+    assert events[0]["event_rank"] == 1
+    assert events[0]["total_rsvps"] == len(events)
+
+
+def test_get_my_events_no_token(client):
+    response = client.get("/api/user/me/events")
+
+    assert response.status_code == 401
+
+
+def test_get_my_events_invalid_token(client):
+    response = client.get(
+        "/api/user/me/events",
+        headers={"Authorization": "Bearer not-a-real-token"},
+    )
+
+    assert response.status_code == 401
