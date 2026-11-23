@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi.responses import JSONResponse
@@ -8,6 +9,13 @@ from app.routes.user import user_router
 from app.routes.organisers import organisers_router
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(events_router)
 app.include_router(auth_router)
